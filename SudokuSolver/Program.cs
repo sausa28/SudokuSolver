@@ -14,10 +14,15 @@ var validValues = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
 var grid = new int?[81];
 input.CopyTo((Span<int?>)grid);
+var startingIndexes = new List<int>();
+for (int i = 0; i < grid.Length; i++) {
+    if (grid[i] is not null)
+	startingIndexes.Add(i);
+}
 
 Solve(grid, 0);
 
-WriteGridToConsole(grid);
+WriteGridToConsole(grid, startingIndexes);
 
 bool Solve(int?[] grid, int startingIndex)
 {
@@ -42,9 +47,10 @@ bool Solve(int?[] grid, int startingIndex)
             if (solved)
                 return true;
         }
+	WriteGridToConsole(grid, startingIndexes);
+	Thread.Sleep(10);
     }
 
-    //WriteGridToConsole(grid);
     grid[i] = null;
     return false;
 }
@@ -118,25 +124,42 @@ IEnumerable<int> GetSquareIndices(int cellIndex)
     }
 }
 
-void WriteGridToConsole(int?[] grid)
+void WriteGridToConsole(int?[] grid, IReadOnlyList<int> startingIndexes)
 {
     Console.Clear();
-    const string lineBreak = "-------------------";
-    Console.WriteLine(lineBreak);
+    const string topLine =       "╔═══╤═══╤═══╦═══╤═══╤═══╦═══╤═══╤═══╗";
+    const string lineBreak =     "╟───┼───┼───╫───┼───┼───╫───┼───┼───╢";
+    const string lineBreakBold = "╠═══╪═══╪═══╬═══╪═══╪═══╬═══╪═══╪═══╣";
+    const string bottomLine =    "╚═══╧═══╧═══╩═══╧═══╧═══╩═══╧═══╧═══╝";
+    Console.WriteLine(topLine);
     for (int r = 0; r < 9; r++)
     {
-        Console.Write("|");
+        Console.Write("║");
         for (int c = 0; c < 9; c++)
         {
-            int? value = grid[r * 9 + c];
+	    int gridIndex = r * 9 + c;
+            int? value = grid[gridIndex];
             if (value is null)
-                Console.Write(" ");
-            else
-                Console.Write(value.ToString());
+                Console.Write("   ");
+            else if (startingIndexes.Contains(gridIndex)) {
+		Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write($" {value} ");
+		Console.ResetColor();
+	    }
+	    else
+                Console.Write($" {value} ");
 
-            Console.Write("|");
+	    if (c % 3 == 2)
+		Console.Write("║");
+	    else
+		Console.Write("│");
         }
         Console.WriteLine();
-        Console.WriteLine(lineBreak);
+	if (r == 8)
+	    Console.WriteLine(bottomLine);
+	else if (r % 3 == 2)
+	    Console.WriteLine(lineBreakBold);
+	else
+	    Console.WriteLine(lineBreak);
     }
 }
