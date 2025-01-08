@@ -1,22 +1,24 @@
-﻿var input = new int?[81]
+﻿var input = new int[81]
 {
-    null,   null,   null,   null,   8,      null,   7,      null,   null,
-    3,      7,      null,   null,   null,   5,      null,   4,      null,
-    null,   null,      9,   null,   null,   2,      null,   null,   null,
-    4,      5,      null,      1,   null,   null,   null,   3,      null,
-    null,   null,   null,   null,   null,   null,   null,   null,   null,
-    null,      9,   null,   null,   null,      3,   null,      7,      6,
-    null,   null,   null,      4,   null,   null,      9,   null,   null,
-    null,      3,   null,      8,   null,   null,   null,      6,      2,
-    null,   null,      1,   null,      5,   null,   null,   null,   null,
+    0, 0, 9,  4, 2, 1,  0, 0, 0,
+    4, 6, 0,  0, 0, 7,  0, 0, 0,
+    0, 1, 0,  0, 6, 0,  5, 0, 7,
+
+    0, 0, 0,  0, 0, 0,  7, 8, 3,
+    9, 0, 0,  0, 0, 0,  0, 0, 2,
+    3, 7, 1,  0, 0, 0,  0, 0, 0,
+
+    8, 0, 2,  0, 5, 0,  0, 1, 0,
+    0, 0, 0,  1, 0, 0,  0, 7, 4,
+    0, 0, 0,  8, 4, 6,  2, 0, 0
 };
 var validValues = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
-var grid = new int?[81];
-input.CopyTo((Span<int?>)grid);
+var grid = new int[81];
+input.CopyTo((Span<int>)grid);
 var startingIndexes = new List<int>();
 for (int i = 0; i < grid.Length; i++) {
-    if (grid[i] is not null)
+    if (grid[i] != 0)
 	startingIndexes.Add(i);
 }
 
@@ -24,10 +26,10 @@ Solve(grid, 0);
 
 WriteGridToConsole(grid, startingIndexes);
 
-bool Solve(int?[] grid, int startingIndex)
+bool Solve(int[] grid, int startingIndex)
 {
     int i = startingIndex;
-    while (grid[i] is not null) // Get first empty square
+    while (grid[i] != 0) // Get first empty square
         i++;
 
     if (i >= grid.Length) // If all squares are populated must be solved (?)
@@ -51,41 +53,41 @@ bool Solve(int?[] grid, int startingIndex)
 	Thread.Sleep(10);
     }
 
-    grid[i] = null;
+    grid[i] = 0;
     return false;
 }
 
-bool IsValid(int?[] grid, int index)
+bool IsValid(int[] grid, int index)
 {
     return CheckRow(grid, index) && CheckColumn(grid, index) && CheckSquare(grid, index);
 }
 
-bool CheckRow(int?[] grid, int cellIndex)
+bool CheckRow(int[] grid, int cellIndex)
 {
     return CheckIndices(grid, GetRowIndices(cellIndex));
 }
 
-bool CheckColumn(int?[] grid, int cellIndex)
+bool CheckColumn(int[] grid, int cellIndex)
 {
     return CheckIndices(grid, GetColumnIndices(cellIndex));
 }
 
-bool CheckSquare(int?[] grid, int cellIndex)
+bool CheckSquare(int[] grid, int cellIndex)
 {
     return CheckIndices(grid, GetSquareIndices(cellIndex));
 }
 
-bool CheckIndices(int?[] grid, IEnumerable<int> indices)
+bool CheckIndices(int[] grid, IEnumerable<int> indices)
 {
     var values = new HashSet<int>();
     foreach (int i in indices)
     {
-        if (grid[i] is null)
+        if (grid[i] == 0)
             continue;
-        if (values.Contains(grid[i]!.Value))
+        if (values.Contains(grid[i]))
             return false;
 
-        values.Add(grid[i]!.Value);
+        values.Add(grid[i]);
     }
 
     return true;
@@ -124,7 +126,7 @@ IEnumerable<int> GetSquareIndices(int cellIndex)
     }
 }
 
-void WriteGridToConsole(int?[] grid, IReadOnlyList<int> startingIndexes)
+void WriteGridToConsole(int[] grid, IReadOnlyList<int> startingIndexes)
 {
     Console.Clear();
     const string topLine =       "╔═══╤═══╤═══╦═══╤═══╤═══╦═══╤═══╤═══╗";
@@ -138,8 +140,8 @@ void WriteGridToConsole(int?[] grid, IReadOnlyList<int> startingIndexes)
         for (int c = 0; c < 9; c++)
         {
 	    int gridIndex = r * 9 + c;
-            int? value = grid[gridIndex];
-            if (value is null)
+            int value = grid[gridIndex];
+            if (value == 0)
                 Console.Write("   ");
             else if (startingIndexes.Contains(gridIndex)) {
 		Console.ForegroundColor = ConsoleColor.Yellow;
