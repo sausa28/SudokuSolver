@@ -1,16 +1,16 @@
 ﻿var input = new int[81]
 {
-    0, 0, 9,  4, 2, 1,  0, 0, 0,
-    4, 6, 0,  0, 0, 7,  0, 0, 0,
-    0, 1, 0,  0, 6, 0,  5, 0, 7,
+    9, 0, 2,  0, 0, 0,  0, 0, 0,
+    0, 0, 7,  1, 0, 6,  0, 4, 0,
+    0, 0, 0,  0, 0, 8,  0, 0, 0,
 
-    0, 0, 0,  0, 0, 0,  7, 8, 3,
-    9, 0, 0,  0, 0, 0,  0, 0, 2,
-    3, 7, 1,  0, 0, 0,  0, 0, 0,
+    0, 5, 0,  9, 0, 0,  0, 0, 8,
+    6, 0, 0,  7, 0, 1,  0, 0, 4,
+    8, 0, 0,  0, 0, 2,  0, 1, 0,
 
-    8, 0, 2,  0, 5, 0,  0, 1, 0,
-    0, 0, 0,  1, 0, 0,  0, 7, 4,
-    0, 0, 0,  8, 4, 6,  2, 0, 0
+    0, 0, 0,  2, 0, 0,  0, 0, 0,
+    0, 9, 0,  4, 0, 3,  5, 0, 0,
+    0, 0, 0,  0, 0, 0,  3, 0, 6
 };
 var validValues = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
@@ -22,14 +22,14 @@ for (int i = 0; i < grid.Length; i++) {
 	startingIndexes.Add(i);
 }
 
+WriteGridToConsole(grid, startingIndexes);
 Solve(grid, 0);
-
 WriteGridToConsole(grid, startingIndexes);
 
 bool Solve(int[] grid, int startingIndex)
 {
     int i = startingIndex;
-    while (grid[i] != 0) // Get first empty square
+    while (i < grid.Length && grid[i] != 0) // Get first empty square
         i++;
 
     if (i >= grid.Length) // If all squares are populated must be solved (?)
@@ -39,6 +39,7 @@ bool Solve(int[] grid, int startingIndex)
     foreach (var value in validValues)
     {
         grid[i] = value;
+	UpdateConsoleGrid(i, value);
         
         if (IsValid(grid, i))
         {
@@ -49,11 +50,11 @@ bool Solve(int[] grid, int startingIndex)
             if (solved)
                 return true;
         }
-	WriteGridToConsole(grid, startingIndexes);
-	Thread.Sleep(10);
+	/*Thread.Sleep(1);*/
     }
 
     grid[i] = 0;
+    UpdateConsoleGrid(i, 0);
     return false;
 }
 
@@ -144,7 +145,7 @@ void WriteGridToConsole(int[] grid, IReadOnlyList<int> startingIndexes)
             if (value == 0)
                 Console.Write("   ");
             else if (startingIndexes.Contains(gridIndex)) {
-		Console.ForegroundColor = ConsoleColor.Yellow;
+		Console.ForegroundColor = ConsoleColor.Blue;
                 Console.Write($" {value} ");
 		Console.ResetColor();
 	    }
@@ -164,4 +165,22 @@ void WriteGridToConsole(int[] grid, IReadOnlyList<int> startingIndexes)
 	else
 	    Console.WriteLine(lineBreak);
     }
+}
+
+void UpdateConsoleGrid(int index, int value) {
+    int origLeft = Console.CursorLeft;
+    int origTop = Console.CursorTop;
+
+    int r = index / 9;
+    int c = index % 9;
+
+    int cursorLeft = 4 * c + 3;
+    int cursorTop = 2 * r + 1;
+    Console.SetCursorPosition(cursorLeft, cursorTop);
+    if (value == 0)
+	Console.Write("\b ");
+    else
+	Console.Write($"\b{value}");
+
+    Console.SetCursorPosition(origLeft, origTop);
 }
